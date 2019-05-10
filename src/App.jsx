@@ -11,7 +11,7 @@ class App extends React.Component {
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
 	      <PriorSnippet />
-    	  <TextEntryComponent interval="15" cb="(self) => alert('You entered' + self.value)" />
+    	  <TextEntryComponent interval="5" cb={(self) => alert('You entered ' + self.state.value)} />
         </header>
       </div>
     );

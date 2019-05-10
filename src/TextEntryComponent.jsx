@@ -31,9 +31,8 @@ class TextEntryComponent extends React.Component {
 	timerUp() {
 		this.stopTimer();
 		this.resetTimer();
-		alert("Time's up!");
 		if (typeof(this.props.cb) == 'function') {
-			this.props.cb();
+			this.props.cb(this);
 		}
 		this.startTimer();
 	}
@@ -100,7 +99,7 @@ class TextEntryComponent extends React.Component {
 				<h4>[{start}, {resume}, {stop}, {reset}]</h4>
 				<h4>[{this.state.start}, {this.state.time}, {this.interval}, {this.state.isTicking ? 'ticking' : 'stopped'}]</h4>
 			<form id="writing">
-			<textarea className="TextEntryComponent-textarea" />
+			<textarea className="TextEntryComponent-textarea" onChange={this.handleChange}/>
 			</form>
 			</div>
 		);
