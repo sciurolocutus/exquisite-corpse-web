@@ -1,13 +1,12 @@
 .TextEntryComponent {
   text-align: center;
-  height: 20vmin;
-  width: 80pct;
+  height: 40vmin;
+  width: 80vmin;
 }
 
-.TextEtryComponent-textarea {
-  height: 100pct;
-  width: 100pct;
-  pointer-events: none;
-  font-size: 30px;
+.TextEntryComponent-textarea {
+  height: 100%;
+  width: 100%;
+  font-size: 24px;
   font-family: serif;
 }

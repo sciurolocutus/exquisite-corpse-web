@@ -1,0 +1,52 @@
+Externalize the timer from the TextEntryComponent
+Flesh out the corpus client to use with exquisite-corpse REST services
+When time's up, fetch next "prior" snippet, display it in upper text area, and post current textarea as a new entry (and clear it)
+Work out creating/joining a session.
+	For N participants, create N corpora, be aware of them, and cycle through them.
+	Round-robin, ordered numerically ascending (but starting with the corpus *you* created) should be the default.
+	Initial session parameters:
+		- # of participants
+		- time to write (in seconds), default 15? 30?
+	Create screen/modal to enter these parameters
+	Create screen/modal to join a session
+	Create REST service over /corpusSessions
+		GET /corpusSessions?filterParams - list available sessions
+		GET /corpusSessions/{corpusSessionId} - get current status of a particular session
+			{
+				"writingInterval": integer, //number of seconds to write; required in initial POST
+				"maxParticipants": integer, //max # of participants (corpora); required in initial POST
+				"currentParticipants": integer, //current # of participants (loosely = #Corpora, see PUT /join debate)
+				"rounds": integer, //# of writing rounds to go; required in initial POST
+				"started": boolean, //default false
+				"startTime": datetime, //default null; when PUT [...]/start is called, it will be populated with a timestamp shortly in the future.
+				"ended": boolean, //default
+				"corpora": [int], //list of integer corpusIds included in this corpus, default []
+			}
+			This should be polled intermittently
+				by the host, to see whether they can start
+				by the client, to see whether the session will start soon.
+			Concern: if a participant "drops out" in the middle (network issues, has to go, etc), what will happen?
+			Answer: the writers will still make their rounds, just the last entry for the corpus
+				the missing writer "would have" been writing on will remain the same on what would have been their turn.
+				Though their voice will be missed, the flow of the game is not overall interrupted.
+		POST /corpusSession - create a session
+			This will only create the session; it is still up to the "host" to 
+		PUT /corpusSession/{corpusSessionId}/join
+			Join a session; bump its participant counter
+			Debate: whether to create a corpus as part of this or not
+			This is a participant action, and if this action is not bundled,
+				it should be executed immediately after receiving a successful response.
+			This should succeed if there is room for this participant.
+			This should fail if there is not.
+		PUT /corpusSession/{corpusSessionId}/start
+			A host will execute this to indicate a session is starting.
+			Populate startTime some number of seconds in the future.
+
+Work out synchronization:
+	Given near-simultaneous corpus-entry submission, but unequal network delays between participants,
+		post-then-immediately-fetch-next behavior may not actually fetch the last submitted entry in the next corpus.
+		One strategy may be to simply have a small explicit delay (of, say 1 second) between submission and fetching.
+		Another may be to have the service called to fetch the last entry, also wait on some sort of synchronization lock,
+			perhaps if it's aware the "last entry" ought to have been submitted in the last second, and not 10 seconds ago,
+			so it waits and polls a few times.
+			GET /corpora/{corpusId}/entries/last -- nonstandard, special waiting behavior
